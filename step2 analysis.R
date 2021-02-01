@@ -275,7 +275,7 @@ ggumfad <- function(m) {
   return(resfinal)
 }
 
-resggumCHINA <- lapply(fadchinalist,ggumfad) # estimated with  generalized graded unfolding model in each dimension, limited by mirt function only use for items unidimensional
+resggumCHINA <- lapply(fadchinalist,ggumfad) # estimated with generalized graded unfolding model in each dimension, limited by mirt function only use for items unidimensional
 resggumFOREIGN <- lapply(fadforeignlist,ggumfad)
 
 
