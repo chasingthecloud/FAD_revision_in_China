@@ -2,13 +2,13 @@ rm(list = ls())
 
 library("car")
 library("dplyr")
-Sys.setlocale(category="LC_ALL",locale="en_US.UTF-8")
+# Sys.setlocale(category="LC_ALL",locale="en_US.UTF-8") #run this for mac OS setting the local language solving the problems in reading Chinese in FAD_1
 
 ################################
 ##########  FAD_1  #############
 ################################
 
-fad1all <- read.csv("FAD_1_CSV.csv",encoding="UTF-8") #which resave FAD_1 as csv with UTF-8
+fad1all <- read.csv("FAD_1_CSV.csv",encoding="UTF-8") #where resave FAD_1 as csv with UTF-8
 head(fad1all[,1:10])
 
 usefulnames1 <- c("id", "age","gender_gene","gender_self_report","education_level",
@@ -21,13 +21,14 @@ usefulnames1 <- c("id", "age","gender_gene","gender_self_report","education_leve
                   "BIG5_C1","BIG5_C2","BIG5_C3","BIG5_C4","BIG5_C5","BIG5_C6","BIG5_C7","BIG5_C8","BIG5_C9","BIG5_C10","BIG5_C11","BIG5_C12", 
                   "BIG5_E1","BIG5_E2","BIG5_E3","BIG5_E4","BIG5_E5","BIG5_E6","BIG5_E7","BIG5_E8", "BIG5_E9","BIG5_E10","BIG5_E11","BIG5_E12", 
                   "BIG5_O1","BIG5_O2","BIG5_O3", "BIG5_O4","BIG5_O5","BIG5_O6","BIG5_O7","BIG5_O8","BIG5_O9","BIG5_O10","BIG5_O11","BIG5_O12")
+#useful names in collected dataset, FAD+ & BIG FIVE INVENTORY with 5 dimensions x 12 items
 
 fad1useful <- fad1all[,usefulnames1]
 head(fad1useful)
 
 table(fad1useful$education_level)
 educationlvl <- as.vector(fad1useful$education_level)
-edu <- car::recode(educationlvl,"'小学及以下'=1;
+edu <- car::recode(educationlvl,"'小学及以下'=1; 
                    '初中'=2;
                    '中专或职高'=3;
                    '高中'=3;
@@ -35,7 +36,7 @@ edu <- car::recode(educationlvl,"'小学及以下'=1;
                    '本科'=5;
                    '硕士'=6;
                    '博士'=7;else=0")
-table(edu)
+table(edu) #recode education level with FAD_2´s standard 
 
 table(fad1useful$gender_gene)
 table(fad1useful$gender_self_report)
@@ -47,7 +48,7 @@ genderfad1 <- function(a){
   return(gender)
 }
 
-gender <- apply(fad1useful, 1, genderfad1)
+gender <- apply(fad1useful, 1, genderfad1) #recode variable geneder, use the biological gender
 table(gender)
 
 fadnames <- c("FD1","FD5","FD9","FD13","FD17",
@@ -56,9 +57,9 @@ fadnames <- c("FD1","FD5","FD9","FD13","FD17",
               "FW4","FW8","FW12","FW16","FW21","FW23","FW26")
 length(fadnames)
 
-NO <- rep(1,times=length(fad1useful[,1]))
+NO <- rep(1,times=length(fad1useful[,1])) #new mark variable, distinguishes different original datasets
 age <- fad1useful[,2]
-fad1final <- cbind(NO,age,gender,edu,fad1useful[,fadnames]+1,fad1useful[,33:92])
+fad1final <- cbind(NO,age,gender,edu,fad1useful[,fadnames]+1,fad1useful[,33:92]) #recode FAD_1 from 0-4 to 1-5
 head(fad1final)
 
 write.csv(fad1final,"NEW_FAD_1.csv",row.names=FALSE,fileEncoding ="UTF-8")
@@ -85,7 +86,7 @@ usefulnames2 <- c("age","gender","edu",
                   "BFI_O1","BFI_O2","BFI_O3","BFI_O4","BFI_O5","BFI_O6","BFI_O7","BFI_O8","BFI_O9","BFI_O10",
                   "BFI_E1","BFI_E2","BFI_E3","BFI_E4","BFI_E5","BFI_E6","BFI_E7","BFI_E8")
 
-fad2useful <- fad2all[,usefulnames2]
+fad2useful <- fad2all[,usefulnames2] #useful names in collected dataset, FAD+, IPC & BIG FIVE INVENTORY with 5 dimensions x 8 items
 NO <- rep(2,times=length(fad2useful[,1]))
 
 fad2final <- cbind(NO,fad2useful)
@@ -159,7 +160,7 @@ fadAFJ <- dplyr::bind_rows(fadAF,fadJfinal)
 head(fadAFJ)
 table(fadAFJ$NO)
 
-g <- c(rep(0,length(fad123[,1])),rep(1,length(fadAFJ[,1])))
+g <- c(rep(0,length(fad123[,1])),rep(1,length(fadAFJ[,1]))) #other new mark variable for CHINESE DATASETS & FOREIGN DATASETS
 
 fadALL <- dplyr::bind_rows(fad123,fadAFJ)
 fadALLfinal <- cbind(g,fadALL)

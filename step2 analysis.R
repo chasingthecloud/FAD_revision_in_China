@@ -12,25 +12,26 @@ library("semTools")
 
 datafadall <- read.csv("cleanfadall.csv")
 head(datafadall)
-datafadchina <- datafadall[which(datafadall$g==0),-1]
-datafadforeign <- datafadall[which(datafadall$g==1),-1]
+datafadchina <- datafadall[which(datafadall$g==0),-1] 
+datafadforeign <- datafadall[which(datafadall$g==1),-1] 
 head(datafadchina)
 head(datafadforeign)
 
-desdatachina <- datafadchina[,1:4]
+desdatachina <- datafadchina[,1:4] #descriptions of chinese datasets
 apply(desdatachina, 2, psych::describe)
 apply(desdatachina, 2, table)
 head(desdatachina)
 
-desdataforeign <- datafadforeign[,1:4]
+desdataforeign <- datafadforeign[,1:4] #descriptions of foriegn datasets
 apply(desdataforeign, 2, psych::describe)
 apply(desdataforeign, 2, table)
 head(desdataforeign)
 
-
-###########################
-######  CTT CHINA  ########
-###########################
+########################################
+########################################
+######  CTT IN CHINESE DATASET  ########
+########################################
+########################################
 
 fadnames <- c("FD1","FD5","FD9","FD13","FD17",
               "SD2","SD6","SD10","SD14","SD18","SD22","SD24",
@@ -47,7 +48,7 @@ resctt <- CTT::reliability(fadchinasolo)
 str(resctt) #alpha==0.759
 iteminfoctt <- as.data.frame(cbind(resctt$itemMean,
                                    apply(fadchinasolo, MARGIN = 2, FUN = sd),
-                                   resctt$pBis,resctt$alphaIfDeleted)) #pBis=item total correlation
+                                   resctt$pBis,resctt$alphaIfDeleted)) #pBis=item-total correlation
 colnames(iteminfoctt) <- c("mean","sd","rpbc","alpha If Deleted")
 round(iteminfoctt,3)
 iteminfoctt[order(iteminfoctt$`alpha If Deleted`,decreasing = T),] #SD6 心理学家和精神病学家最终会弄清楚人类所有的行为  Psychologists and psychiatrists will eventually figure out all human behavior
@@ -59,19 +60,21 @@ which(coritems<1 & coritems>0.6)  #FD1-FD9 == 0.7356
 #FD1 我相信未来是命运已经安排好了的  I believe that the future has already been determined by fate
 #FD9 命运早已为每个人做好安排  Fate already has a plan for everyone
 
-corFD <- cor(datafadchina$FD,datafadchina[,fadnames])
+corFD <- cor(datafadchina$FD,datafadchina[,fadnames]) #correlation between each dimension and each items
 corSD <- cor(datafadchina$SD,datafadchina[,fadnames])
 corUP <- cor(datafadchina$UP,datafadchina[,fadnames])
 corFW <- cor(datafadchina$FW,datafadchina[,fadnames])
 
 cor4withitems <- t(rbind(corFD,corSD,corUP,corFW))
-colnames(cor4withitems) <- c("FD","SD","UP","FW")
+colnames(cor4withitems) <- c("FD","SD","UP","FW") #correlation between 4 dimensions
 round(cor4withitems,3)
 # cor4withitems[order(cor4withitems[,4],decreasing = T),]  #1:4
 
-###########################
-###### CTT FOREIGN ########
-###########################
+########################################
+########################################
+######  CTT IN FOREIGN DATASET  ########
+########################################
+########################################
 
 fadforeignsolo <- datafadforeign[,fadnames]
 apply(fadforeignsolo,2,describe)
@@ -84,7 +87,7 @@ iteminfocttf <- as.data.frame(cbind(rescttf$itemMean,
                                    rescttf$pBis,rescttf$alphaIfDeleted)) #pBis=item total correlation
 colnames(iteminfocttf) <- c("mean","sd","rpbc","alpha If Deleted")
 round(iteminfocttf,3)
-iteminfocttf[order(iteminfocttf$`alpha If Deleted`,decreasing = T),] #FW12 
+iteminfocttf[order(iteminfocttf$`alpha If Deleted`,decreasing = T),] #FW12 People can overcome any obstacles if they truly want to
 
 cor4f <- cor(datafadforeign[,c("FD","SD","UP","FW")])
 coritemsf <- cor(datafadforeign[,fadnames])
@@ -103,11 +106,11 @@ colnames(cor4withitemsf) <- c("FD","SD","UP","FW")
 round(cor4withitemsf,3)
 
 
-
+###########################
 ###########################
 ##########  CFA  ##########
 ###########################
-
+###########################
 
 model <- 'FD =~ FD1 + FD5 + FD9 + FD13 + FD17;
 SD =~ SD2 + SD6 + SD10 + SD14 + SD18 + SD22 + SD24;
@@ -130,7 +133,7 @@ semPlot::semPaths(rescfafitFOREIGN,"std",rotation = 2, layout = "tree2", nCharNo
                   edge.label.cex=1.2, residuals = F)
 semTools::moreFitIndices(rescfafitFOREIGN)
 
-
+#the possible model based on FAD_1
 # model1 <- 'FD =~ FD1 + FD5 + FD9 + FD13 + FD17;
 # SD1 =~ SD6 + SD22;
 # GEN =~ SD2 + SD10 + SD18;
@@ -139,10 +142,11 @@ semTools::moreFitIndices(rescfafitFOREIGN)
 # FW =~ FW4 + FW8 + FW12 + FW16 + FW21 + FW23 + FW26'
 
 
-############################
-####### Invariance #########
-####### CFA MULTIGROUP ##### 
-############################
+#################################################
+############# Invariance ########################
+############# CFA MULTIGROUP ####################
+############# BETWEEN CHINESE & FORIEGN #########
+#################################################
 
 fadsolo <- datafadall[,fadnames]
 head(fadsolo)
@@ -156,10 +160,10 @@ dataforinvariance$g <- factor(dataforinvariance[,1],levels=c("0","1"))
 table(dataforinvariance$g)
 
 config <- cfa(model, dataforinvariance, group="g")  
-weak <- cfa(model, dataforinvariance, group="g", group.equal="loadings") #metrica, peso factorial
-strong<- cfa(model, dataforinvariance, group="g", group.equal= c("loadings", "intercepts"))  #escalar, fijamos que lo mismo peso y intercepts
+weak <- cfa(model, dataforinvariance, group="g", group.equal="loadings") #factor weight
+strong<- cfa(model, dataforinvariance, group="g", group.equal= c("loadings", "intercepts"))  #set the same weight and intercepts
 strict<- cfa(model, dataforinvariance, group="g", 
-             group.equal= c("loadings", "intercepts", "residuals"))   #residuos
+             group.equal= c("loadings", "intercepts", "residuals"))   #residues
 summary(config)
 summary(weak)
 summary(strong)
@@ -169,12 +173,13 @@ anova(config, weak, strong, strict)
 measurementInvariance(model=model, data=dataforinvariance, group="g",estimator="WLSM") #"ULS"
 
 
-
+###########################
 ###########################
 ##########  EFA  ##########
 ###########################
+###########################
 
-resefaCHINA <- psych::fa(fadchinasolo, nfactors = 4, rotate = "oblimin", fm = "ml") 
+resefaCHINA <- psych::fa(fadchinasolo, nfactors = 4, rotate = "oblimin", fm = "ml")  #with 4 dimensions
 resefaCHINA$loading
 fa.diagram(resefaCHINA)
 
@@ -183,7 +188,9 @@ resefaFOREIGN$loading
 fa.diagram(resefaFOREIGN)
 
 ###########################
+###########################
 ##########  CPA  ##########
+###########################
 ###########################
 
 rescpa <- psych::fa.parallel(fadsolo,fm = "uls")
@@ -193,7 +200,7 @@ resPA2CHINA<- as.data.frame(cbind(rescpaCHINA$pc.values,rescpaCHINA$pc.sim))
 colnames(resPA2CHINA) <- c("PC values","PC simulated")
 round(resPA2CHINA,3)
 
-# psych::fa(fadchinasolo, nfactors = 3, rotate = "oblimin", fm = "ml")$loading
+# psych::fa(fadchinasolo, nfactors = 4, rotate = "oblimin", fm = "ml")$loading
 
 rescpaFOREIGN <- psych::fa.parallel(fadforeignsolo,fm = "uls")
 resPA2FOREIGN<- as.data.frame(cbind(rescpaFOREIGN$pc.values,rescpaFOREIGN$pc.sim))
@@ -215,7 +222,7 @@ library(lordif)
 
 fitCHINA <- grm(fadchinasolo)
 fitCHINA
-plot(fitCHINA, items = 3)
+plot(fitCHINA, items = 3) #example
 plot(fitCHINA, type = c("IIC"), items=1:5)
 plot(fitCHINA, type = c("IIC"), items=3)
 plot(fitCHINA, type = c("IIC"), items=0,lwd = 2)
@@ -224,7 +231,7 @@ resirtCHINA <- factor.scores(fitCHINA,fadchinasolo)
 cor(fadchinasolo$FD5,resirtCHINA$score.dat$FD5)
 
 difC <- resirtCHINA$score.dat[,1:27]-fadchinasolo
-sum(difC)
+sum(difC) #differences between the estimated scores and the real ones
 
 
 fitFOREIGN <- grm(fadforeignsolo)
@@ -268,19 +275,21 @@ ggumfad <- function(m) {
   return(resfinal)
 }
 
-resggumCHINA <- lapply(fadchinalist,ggumfad)
+resggumCHINA <- lapply(fadchinalist,ggumfad) # estimated with  generalized graded unfolding model in each dimension, limited by mirt function only use for items unidimensional
 resggumFOREIGN <- lapply(fadforeignlist,ggumfad)
 
 
-############################
-####### Invariance #########
-####### LORDIF IN IRT  ##### 
-############################
+################################################
+############### Invariance #####################
+############### LORDIF IN IRT ##################
+######### Using g as the latent variable########
+############### WASNT RUNNING WELL##############
+################################################
 
 reslordif <- lordif(fadsolo[,-23], g, criterion = "Chisqr", 
                     pseudo.R2 = c("Nagelkerke"),
                     alpha = 0.05, minCell = 1)
-print(reslordif)
+print(reslordif) #choose Lordif as one of the most appropriate and economic way
 summary(reslordif)
 
 pchi <-as.data.frame(round(cbind(reslordif$stats$chi12,
